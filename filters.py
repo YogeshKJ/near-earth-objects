@@ -17,6 +17,7 @@ iterator.
 You'll edit this file in Tasks 3a and 3c.
 """
 import operator
+from itertools import islice
 
 
 class UnsupportedCriterionError(NotImplementedError):
@@ -38,6 +39,7 @@ class AttributeFilter:
     Concrete subclasses can override the `get` classmethod to provide custom
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
+
     def __init__(self, op, value):
         """Construct a new `AttributeFilter` from an binary predicate and a reference value.
 
@@ -70,6 +72,81 @@ class AttributeFilter:
 
     def __repr__(self):
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
+
+
+class DateAttribute(AttributeFilter):
+    def __init__(self, op, value):
+        super().__init__(op, value)
+
+    @classmethod
+    def get(cls, approach):
+        """Get the date attribute from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        """
+
+        return approach.time.date()
+
+
+class DistanceAttribute(AttributeFilter):
+    def __init__(self, op, value):
+        super().__init__(op, value)
+
+    @classmethod
+    def get(cls, approach):
+        """Get the distance attribute from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        """
+
+        return approach.distance
+
+
+class VelocityAttribute(AttributeFilter):
+    def __init__(self, op, value):
+        super().__init__(op, value)
+
+    @classmethod
+    def get(cls, approach):
+        """Get the velocity attribute from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        """
+
+        return approach.velocity
+
+
+class DiameterAttribute(AttributeFilter):
+    def __init__(self, op, value):
+        super().__init__(op, value)
+
+    @classmethod
+    def get(cls, approach):
+        """Get the diameter attribute from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        """
+
+        return approach.neo.diameter
+
+
+class HazardousAttribute(AttributeFilter):
+    def __init__(self, op, value):
+        super().__init__(op, value)
+
+    @classmethod
+    def get(cls, approach):
+        """Get the hazardous attribute from a close approach.
+
+        :param approach: A `CloseApproach` on which to evaluate this filter.
+        :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
+        """
+
+        return approach.neo.hazardous
 
 
 def create_filters(
@@ -109,7 +186,44 @@ def create_filters(
     :return: A collection of filters for use with `query`.
     """
     # TODO: Decide how you will represent your filters.
-    return ()
+    filters = list()
+
+    if date:
+        filter_date = DateAttribute(operator.eq, date)
+        filters.append(filter_date)
+    if start_date:
+        filter_start_date = DateAttribute(operator.ge, start_date)
+        filters.append(filter_start_date)
+    if end_date:
+        filter_end_date = DateAttribute(operator.le, end_date)
+        filters.append(filter_end_date)
+
+    if distance_min:
+        filters_distance_min = DistanceAttribute(operator.gt, distance_min)
+        filters.append(filters_distance_min)
+    if distance_max:
+        filters_distance_max = DistanceAttribute(operator.lt, distance_max)
+        filters.append(filters_distance_max)
+
+    if velocity_min:
+        filters_velocity_min = VelocityAttribute(operator.gt, velocity_min)
+        filters.append(filters_velocity_min)
+    if velocity_max:
+        filters_velocity_max = VelocityAttribute(operator.lt, velocity_max)
+        filters.append(filters_velocity_max)
+
+    if diameter_min:
+        filters_diameter_min = DiameterAttribute(operator.gt, diameter_min)
+        filters.append(filters_diameter_min)
+    if diameter_max:
+        filters_diameter_max = DiameterAttribute(operator.lt, diameter_max)
+        filters.append(filters_diameter_max)
+
+    if hazardous is not None:
+        filter_hazardous = HazardousAttribute(operator.eq, hazardous)
+        filters.append(filter_hazardous)
+
+    return filters
 
 
 def limit(iterator, n=None):
@@ -122,4 +236,7 @@ def limit(iterator, n=None):
     :yield: The first (at most) `n` values from the iterator.
     """
     # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if not n:
+        return list(iterator)
+
+    return islice(iterator, n)
