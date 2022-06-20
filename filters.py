@@ -75,7 +75,10 @@ class AttributeFilter:
 
 
 class DateAttribute(AttributeFilter):
+    """Subclass for date attribute."""
+
     def __init__(self, op, value):
+        """Get operator and operand value."""
         super().__init__(op, value)
 
     @classmethod
@@ -85,12 +88,14 @@ class DateAttribute(AttributeFilter):
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
-
         return approach.time.date()
 
 
 class DistanceAttribute(AttributeFilter):
+    """Subclass for distance attribute."""
+
     def __init__(self, op, value):
+        """Get operator and operand value."""
         super().__init__(op, value)
 
     @classmethod
@@ -100,12 +105,14 @@ class DistanceAttribute(AttributeFilter):
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
-
         return approach.distance
 
 
 class VelocityAttribute(AttributeFilter):
+    """Subclass for velocity attribute."""
+
     def __init__(self, op, value):
+        """Get operator and operand value."""
         super().__init__(op, value)
 
     @classmethod
@@ -115,12 +122,14 @@ class VelocityAttribute(AttributeFilter):
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
-
         return approach.velocity
 
 
 class DiameterAttribute(AttributeFilter):
+    """Subclass for diameter attribute."""
+
     def __init__(self, op, value):
+        """Get operator and operand value."""
         super().__init__(op, value)
 
     @classmethod
@@ -130,12 +139,14 @@ class DiameterAttribute(AttributeFilter):
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
-
         return approach.neo.diameter
 
 
 class HazardousAttribute(AttributeFilter):
+    """Subclass for hazardous attribute."""
+
     def __init__(self, op, value):
+        """Get operator and operand value."""
         super().__init__(op, value)
 
     @classmethod
@@ -145,7 +156,6 @@ class HazardousAttribute(AttributeFilter):
         :param approach: A `CloseApproach` on which to evaluate this filter.
         :return: The value of an attribute of interest, comparable to `self.value` via `self.op`.
         """
-
         return approach.neo.hazardous
 
 
@@ -185,7 +195,6 @@ def create_filters(
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
     :return: A collection of filters for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
     filters = list()
 
     if date:
@@ -235,7 +244,6 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
     if not n:
         return list(iterator)
 
